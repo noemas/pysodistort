@@ -160,7 +160,7 @@ def extract_amplitude(_out_html, _irrep, _disp, _abs = True):
     #search the displacements in the irrep data
     disp_pattern = '(.*)' + _disp
     disp_data = re.search(disp_pattern, irrep_data[0])
-    if irrep_data == None:
+    if disp_data == None:
         sys.exit("displacement not present")
     amplitude = float(disp_data[0].split("\"")[5])
     if _abs:
