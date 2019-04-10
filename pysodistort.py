@@ -155,14 +155,17 @@ def extract_amplitude(_out_html, _irrep, _disp, _abs = True):
     #search for the specified irrep
     irrep_pattern = '' + _irrep + '\\s' + '(.|\\n)*?<p>'
     irrep_data = re.search(irrep_pattern, _out_html)
+    amplitude = 0
     if irrep_data == None:
-        sys.exit("irrep not present")
-    #search the displacements in the irrep data
-    disp_pattern = '(.*)' + _disp
-    disp_data = re.search(disp_pattern, irrep_data[0])
-    if disp_data == None:
-        sys.exit("displacement not present")
-    amplitude = float(disp_data[0].split("\"")[5])
+        print("Warning: irrep not present. Setting amplitude to 0.")
+    else:
+        #search the displacements in the irrep data
+        disp_pattern = '(.*)' + _disp
+        disp_data = re.search(disp_pattern, irrep_data[0])
+        if disp_data == None:
+            print("Warning: displacement not present. Setting amplitude to 0.")
+        else:
+            amplitude = float(disp_data[0].split("\"")[5])
     if _abs:
         amplitude = abs(amplitude)
     return amplitude   
