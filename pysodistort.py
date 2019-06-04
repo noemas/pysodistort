@@ -11,8 +11,8 @@ import numpy as np
 #The output will be the final html file
 def submit_isodistort(_parent_cif, _child_cif, basis_prompt = True, _basis = ""):
     #php urls
-    upload_php = "http://stokes.byu.edu/iso/isodistortuploadfile.php"
-    form_php = "http://stokes.byu.edu/iso/isodistortform.php"
+    upload_php = "https://stokes.byu.edu/iso/isodistortuploadfile.php"
+    form_php = "https://stokes.byu.edu/iso/isodistortform.php"
     
     #prepare the POST parameters for the upload of the parent cif
     parameters = {'input':'uploadparentcif'}
