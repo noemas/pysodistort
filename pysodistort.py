@@ -5,11 +5,14 @@ import numpy as np
 
 #_____________________________________________________________________________________________#
 
-#function that will submit a parent and a child cif to ISODISTORT. You can specify if you want to choose the 
-#possible bases during runtime or if you want to use a predetermined basis. The basis needs to have the following syntax:
+#function that will submit a parent (_parent_cif) and a child cif (_child_cif) to ISODISTORT. You can specify if you want to choose the 
+#possible bases during runtime (_basis_prompt) or if you want to use a predetermined basis (_basis, _basis_number).
+#To do so either specify the basis (_basis) or give the number of the basis (_basis_number)
+#If the basis is provided with _basis, it needs to have the following syntax:
 #"x1 y1 z1 x2 y2 z2 x3 y3 z3 t" i.e. the first 3 numbers correspond to the first basis vector etc.
 #The output will be the final html file
-def submit_isodistort(_parent_cif, _child_cif, basis_prompt = True, _basis = ""):
+
+def submit_isodistort(_parent_cif, _child_cif, _basis_prompt = True, _basis = "", _basis_number = None):
     #php urls
     upload_php = "https://stokes.byu.edu/iso/isodistortuploadfile.php"
     form_php = "https://stokes.byu.edu/iso/isodistortform.php"
@@ -72,8 +75,13 @@ def submit_isodistort(_parent_cif, _child_cif, basis_prompt = True, _basis = "")
     num_of_bases = int(bases.count('OPTION') / 2 - 1)
        
         
-    #get the basis index if prompting
-    if basis_prompt:
+    #get the basis index if prompting 
+    if _basis_prompt:
+        if not _basis == "":
+            sys.exit("You can't prompt for basis (_basis_prompt) if a basis is specified (_basis)")
+        if not _basis_number == None:
+            sys.exit("You can't prompt for basis (_basis_prompt) if a basis number is specified (_basis_number)")
+
         #first print all bases
         for i in range(0, num_of_bases):
             _basis = re.findall(r'VALUE=(.*)', bases)[i]
@@ -81,14 +89,28 @@ def submit_isodistort(_parent_cif, _child_cif, basis_prompt = True, _basis = "")
             print("Basis " + str(i+1) + ": " + str(_basis)) 
         #prompt index
         basis_number = int(input("Enter basis number: ")) 
-        if num_of_bases < _basis_number:
-            sys.exit("You have chosen basis number " + str(_basis_number) + " but there are only " + str(num_of_bases) + " bases.")
+        if num_of_bases < basis_number:
+            sys.exit("You have chosen basis number " + str(basis_number) + " but there are only " + str(num_of_bases) + " bases.")
         
         _basis = re.findall(r'VALUE=(.*)', bases)[basis_number - 1]
         _basis = _basis.split("\"")[1]
         print("Chosen basis: " + str(_basis))
     
-    
+    #get the basis if basis number is given
+    if _basis_number:
+        if _basis_prompt:
+            sys.exit("You can't default basis number (_basis_number) if a basis is prompted (_basis_prompt)")
+        if not _basis == "":
+            sys.exit("You can't default basis number (_basis_number) if a basis is specified (_basis)")
+        if num_of_bases < _basis_number:
+            sys.exit("You have chosen basis number " + str(_basis_number) + " but there are only " + str(num_of_bases) + " bases.")
+
+        _basis = re.findall(r'VALUE=(.*)', bases)[_basis_number - 1]
+        _basis = _basis.split("\"")[1]
+        print("Chosen basis: " + str(_basis))
+
+
+
     #get the necessary hidden values again
     hidden_values = re.findall(r'hidden(.*)', form.text)
     num_of_values = len(hidden_values)
@@ -175,6 +197,6 @@ def extract_amplitude(_out_html, _irrep, _disp, _abs = True):
 
 parent_cif = "WO3_P4ncc_LDA.cif"
 child_cif = "WO3_mod.cif"
-out_html = submit_isodistort(parent_cif, child_cif, False, "2 0 0 0 2 0 0 0 1 1")  
+out_html = submit_isodistort(parent_cif, child_cif, False, "", 2)  
 Q = extract_amplitude(out_html, "M1", "[W1:c:dsp]E*_1(a)")
 print(Q)
