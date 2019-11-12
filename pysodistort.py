@@ -152,10 +152,13 @@ def submit_isodistort(_parent_cif, _child_cif, _basis_prompt = True, _basis = ""
     form = requests.post(form_php, data = parameters)
     
     if re.search("Wyckoff positions in parent are not compatible with Wyckoff positions in subgroup", form.text):
-        sys.exit("Wyckoff positions in parent are not compatible with Wyckoff positions in subgroup")
+        sys.exit("ISODISTORT: Wyckoff positions in parent are not compatible with Wyckoff positions in subgroup")
     
     if re.search("Subgroup and basis vectors are not compatible with parent.", form.text):
-        sys.exit("Subgroup and basis vectors are not compatible with parent.")     
+        sys.exit("ISODISTORT: Subgroup and basis vectors are not compatible with parent.")
+
+    if re.search("This program has bombed", form.text): 
+        sys.exit("ISODISTORT: This program has bombed")
         
     #amplitudes can already be found in this html. No need for mode display submission
     return form.text
@@ -197,6 +200,6 @@ def extract_amplitude(_out_html, _irrep, _disp, _abs = True):
 
 parent_cif = "WO3_P4ncc_LDA.cif"
 child_cif = "WO3_mod.cif"
-out_html = submit_isodistort(parent_cif, child_cif, False, "", 2)  
+out_html = submit_isodistort(parent_cif, child_cif, False, "", 2) 
 Q = extract_amplitude(out_html, "M1", "[W1:c:dsp]E*_1(a)")
 print(Q)
